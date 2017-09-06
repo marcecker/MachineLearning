@@ -1,1 +1,1 @@
-from classifiers import naive_bayes
+from classifiers import naive_bayes_classifier

@@ -1,38 +1,28 @@
-from database import balloons_adult_and_stretch as db
 from optparse import OptionParser
-import os
-
+from classifiers.naive_bayes_classifier import NaiveBayesClassifier
+import pandas as pd
+import json
 
 def parse_arguments():
     parser = OptionParser()
-
-    parser.add_option("-a", "--add-training-data", dest="trainings_data",
-        help="Path to a csv file containing trainings_data")
-    parser.add_option("-t", "--training", action="store_true", dest="training",
-        default=False, help="This flag starts the training on the dataset")
+    parser.add_option("-d", "--datafile", action="store", type="string", dest="datafile")
+    parser.add_option("-n", "--namefile", action="store", type="string", dest="namefile")
+    parser.add_option("-c", "--class-key", action="store", type="string", dest="class_key", default="class")
 
     (options, args) = parser.parse_args()
 
-    verify_options(options, parser)
+    if not options.datafile:
+        parser.error("-d (--datafile) is required")
+
+    if not options.namefile:
+        parser.error("-n (--namefile) is required")
 
     return options
 
-
-def verify_options(options, parser):
-    if options.trainings_data and options.training:
-        parser.error("It is not allowed to use more than one flag out of [-a, -t]")
-
-    if not options.trainings_data and not options.training:
-        parser.error("At least one flag out of [-a, -t] must be selected")
-
-    if options.trainings_data and not os.path.isfile(options.trainings_data):
-        parser.error("Invalid file path {}".format(options.trainings_data))
-
-
 if __name__ == "__main__":
     options = parse_arguments()
-    if options.trainings_data:
-        db.add_trainings_data_csv(options.trainings_data)
+    names = list(pd.read_csv(options.namefile).columns.values)
+    dataset = pd.read_csv(options.datafile, names=names)
 
-    else:
-        print(db.benchmark())
+    classifier = NaiveBayesClassifier(names, dataset, options.class_key)
+    print(classifier.benchmark())
