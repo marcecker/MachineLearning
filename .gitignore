@@ -1,4 +1,4 @@
-./__pycache__
-./old
-./classifiers/__pycache__
-./database/__pycache__
+__pycache__
+old
+classifiers/__pycache__
+database/__pycache__
